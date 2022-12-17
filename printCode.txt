@@ -1,0 +1,184 @@
+using System;
+using System.Data;
+using iTextSharp.text;
+using iTextSharp.text.pdf;
+using System.Data.SqlClient;
+using System.Configuration;
+using System.Windows.Forms;
+using WindowsFormsApp2.EContactClasses;
+using System.IO;
+using Font = iTextSharp.text.Font;
+using System.Drawing;
+using iTextSharp.text.pdf.security;
+
+using System.Collections.Generic;
+
+namespace WindowsFormsApp2
+{
+    public partial class EContact : Form
+    {
+        public EContact()
+        {
+            InitializeComponent();
+        }
+        contactClass cobj = new contactClass();
+        private int numberOfItemsPerPage = 0;
+        private int numberOfItemsPrintedSoFar = 0;
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void textBox1_TextChanged_1(object sender, EventArgs e)
+        {
+
+        }
+
+        private void lblSearch_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnAdd_Click(object sender, EventArgs e)
+        {
+            // get the value from input fields
+          
+
+            // Load data on datagrid table
+            DataTable dt = cobj.select();
+            dgvContactList.DataSource = dt;
+        }
+
+        private void pictureBox1_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+
+        private void EContact_Load(object sender, EventArgs e)
+        {
+            // Load data on datagrid table
+            DataTable dt = cobj.select();
+            dgvContactList.DataSource = dt;
+        }
+        
+        
+        private void printDocument1_PrintPage(object sender, System.Drawing.Printing.PrintPageEventArgs e)
+        {
+            string curdhead = "Token";
+            e.Graphics.DrawString(curdhead, new System.Drawing.Font("Book Antiqua", 9, FontStyle.Bold), Brushes.Black, 350, 50);
+
+            string l1 = "---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------";
+            e.Graphics.DrawString(l1, new System.Drawing.Font("Book Antiqua", 9, FontStyle.Bold), Brushes.Black, 0, 100);
+
+            string g1 = "Student's Code ";
+            e.Graphics.DrawString(g1, new System.Drawing.Font("Book Antiqua", 9, FontStyle.Bold), Brushes.Black, 80, 140);
+
+            string g2 = "Time";
+            e.Graphics.DrawString(g2, new System.Drawing.Font("Book Antiqua", 9, FontStyle.Bold), Brushes.Black, 250, 140);
+
+            string g3 = "Date";
+            e.Graphics.DrawString(g3, new System.Drawing.Font("Book Antiqua", 9, FontStyle.Bold), Brushes.Black, 500, 140);
+
+            string l2 = "---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------";
+            e.Graphics.DrawString(l2, new System.Drawing.Font("Book Antiqua", 9, FontStyle.Bold), Brushes.Black, 0, 160);
+
+            int height = 165;
+            for (int l = numberOfItemsPrintedSoFar; l < dgvContactList.Rows.Count; l++)
+            {
+                numberOfItemsPerPage = numberOfItemsPerPage + 1;
+                if (numberOfItemsPerPage <= 50)
+                {
+                    numberOfItemsPrintedSoFar++;
+
+                    if (numberOfItemsPrintedSoFar <= dgvContactList.Rows.Count)
+                    {
+
+                        height += dgvContactList.Rows[0].Height;
+                        e.Graphics.DrawString(dgvContactList.Rows[l].Cells[1].FormattedValue.ToString(), new System.Drawing.Font("Book Antiqua", 9, FontStyle.Bold), Brushes.Black, 80, height);// dgvContactList.Font = new Font("Book Antiqua", 8), Brushes.Black, new RectangleF(80, height, dgvContactList.Columns[0].Width, dgvContactList.Rows[0].Height));
+                        e.Graphics.DrawString(dgvContactList.Rows[l].Cells[4].FormattedValue.ToString(), new System.Drawing.Font("Book Antiqua", 9, FontStyle.Bold), Brushes.Black, 250, height);// dgvContactList.Font = new Font("Book Antiqua", 8), Brushes.Black, new RectangleF(250, height, dgvContactList.Columns[0].Width, dgvContactList.Rows[0].Height));
+                        e.Graphics.DrawString(dgvContactList.Rows[l].Cells[6].FormattedValue.ToString(), new System.Drawing.Font("Book Antiqua", 9, FontStyle.Bold), Brushes.Black, 500, height);// dgvContactList.Font = new Font("Book Antiqua", 8), Brushes.Black, new RectangleF(250, height, dgvContactList.Columns[0].Width, dgvContactList.Rows[0].Height));
+                    }
+                    else
+                    {
+                        e.HasMorePages = false;
+                    }
+
+                }
+                else
+                {
+                    numberOfItemsPerPage = 0;
+                    e.HasMorePages = true;
+                    return;
+
+                }
+
+
+            }
+            numberOfItemsPerPage = 0;
+            numberOfItemsPrintedSoFar = 0;
+        }
+
+        private void btnPrint_Click(object sender, EventArgs e)
+        {
+            System.Windows.Forms.PrintDialog PrintDialog1 = new PrintDialog();
+            PrintDialog1.AllowSomePages = true;
+            PrintDialog1.ShowHelp = true;
+            PrintDialog1.Document = printDocument1;
+           DialogResult result = PrintDialog1.ShowDialog();
+            
+                printDocument1.Print();
+            
+        }
+
+        //private void btnClear_Click(object sender, EventArgs e)
+        //{
+        //    // call the clear method here
+        //    clear();
+        //}
+
+        //// method to clear all fields after adding data
+        //public void clear()
+        //{
+        //    txtboxContactId.Text = "";
+        //    txtBoxFirstName.Text = "";
+        //    txtBoxLastName.Text = "";
+        //    txtBoxContactNumber.Text = "";
+        //    txtBoxAddress.Text = "";
+        //    cmbGender.Text = "";
+
+        //}
+
+    }
+
+    //private void RDLCExportToPdf()
+    //{
+    //    string deviceInfo = "";
+    //    string streamIds;
+    //    Microsoft.Build.Tasks.Warning[] warnings;
+
+    //    string mimeType = string.Empty;
+    //    string encoding = string.Empty;
+    //    string extension = string.Empty;
+
+    //    ReportViewer viewer = new ReportViewer();
+    //    viewer.ProcessingMode = ProcessingMode.Local;
+    //    viewer.LocalReport.ReportPath = "PdfReport.rdlc";
+    //    viewer.LocalReport.DataSources.Add(new ReportDataSource("EContactDS", GetContactInfo()));
+    //}
+
+    //private List<contactClass> GetContactInfo()
+    //{
+    //    return new List<contactClass> { 
+
+    //        new contactClass{FirstName = Firs}
+
+    //        };
+    //}
+}
+
